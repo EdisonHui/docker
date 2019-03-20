@@ -1,5 +1,7 @@
 FROM php:7.2-fpm
 
+ENV TIMEZONE Asia/Shanghai
+
 ############################
 #定义PHP相关扩展版本号
 ############################
@@ -33,7 +35,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    g++
+    g++ \
+    wget
 
 
 ############################
@@ -92,7 +95,7 @@ RUN curl -fsSL https://github.com/phalcon/cphalcon/archive/v${PHALCON_VERSION}.t
 ############################
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
-RUN curl -sS https://getcomposer.org/installer | php \
+RUN curl -fsSL https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer \
     && chmod a+x /usr/local/bin/composer
 
@@ -100,11 +103,11 @@ RUN curl -sS https://getcomposer.org/installer | php \
 #安装PHP单元测试phpunit
 ############################
 
-RUN curl -sS https://phar.phpunit.de/phpunit-${PHPUNIT_VERSION}.phar -o phpunit.phar \
-    && mv phpunit.phar /usr/local/bin/phpunit \
-    && chmod a+x /usr/local/bin/phpunit
+RUN wget -O phpunit https://phar.phpunit.de/phpunit-${PHPUNIT_VERSION}.phar \
+    && mv phpunit /usr/local/bin/phpunit \
+    && chmod +x /usr/local/bin/phpunit
 
 ############################
 #添加PHP配置
 ############################
-ADD xdebug.ini /usr/local/etc/php/conf.d/
+ADD extend.ini /usr/local/etc/php/conf.d/
