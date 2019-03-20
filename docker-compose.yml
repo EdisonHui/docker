@@ -13,7 +13,7 @@ services:
         PHALCON_VERSION: 3.4.3
         SWOOLE_VERSION: 4.3.1
         PHPUNIT_VERSION: 8
-    container_name: dnmp-php
+    container_name: php
     ports:
       - 9000:9000
     expose:
@@ -28,7 +28,7 @@ services:
     build:
       context: dockerfile/nginx
       dockerfile: dockerfile
-    container_name: dnmp-nginx
+    container_name: nginx
     ports:
       - 80:80
       - 443:443
@@ -50,7 +50,7 @@ services:
       dockerfile: dockerfile
       args:
         MYSQL_VERSION: 5.7
-    container_name: dnmp-mysql
+    container_name: mysql
     ports:
       - 3306:3306
     expose:
@@ -59,7 +59,7 @@ services:
       - dnmp
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "RainyDB2018"
+      MYSQL_ROOT_PASSWORD: admin
     volumes:
       - ${MYSQL_DATA_ROOT}:/var/lib/mysql
   phpmyadmin:
@@ -73,7 +73,7 @@ services:
     environment:
       - PMA_HOST=mysql
       - PMA_PORT=3306
-    container_name: dnmp-phpmyadmin
+    container_name: phpmyadmin
     restart: always
   redis:
     build:
@@ -82,10 +82,54 @@ services:
       args:
         REDIS_VERSION: 4
     ports:
-      - "6379:6379"
-    container_name: docker-lnmp-redis
+      - 6379:6379
+    container_name: redis
     networks:
       - dnmp
     restart: always
+  rabbitmq:
+    build:
+      context: ./dockerfile/rabbitmq
+      dockerfile: dockerfile
+      args:
+        RABBITMQ_VERSION: 3.7
+    ports:
+      - 15672:15672
+      - 5672:5672
+    networks:
+      - dnmp
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    restart: always
+  mongo:
+    build:
+      context: ./dockerfile/mongo
+      dockerfile: dockerfile
+      args:
+        MONGO_VERSION: 4.0.6
+    restart: always
+    networks:
+      - dnmp
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+  mongoexpress:
+    build:
+      context: ./dockerfile/mongoexpress
+      dockerfile: dockerfile
+      args:
+        MONGO_EXPRESS_VERSION: latest
+    restart: always
+    networks:
+      - dnmp
+    ports:
+      - 8081:8081
+    container_name: mongoexpress
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
 networks:
   dnmp:
