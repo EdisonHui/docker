@@ -1,0 +1,110 @@
+FROM php:7.2-fpm
+
+############################
+#定义PHP相关扩展版本号
+############################
+ARG PHPREDIS_VERSION
+ARG PHALCON_VERSION
+ARG SWOOLE_VERSION
+ARG XDEBUG_VERSION
+ARG AMQP_VERSION
+ARG MCRYPT_VERSION
+ARG MONGODB_VERSION
+ARG PHPUNIT_VERSION
+
+RUN sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list
+RUN sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list
+
+############################
+#安装PHP依赖
+############################
+
+RUN apt-get update && apt-get install -y \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    librabbitmq-dev \
+    libmcrypt-dev \
+    libpq-dev \
+    libicu-dev \
+    libxml2-dev \
+    zlib1g-dev \
+    libxslt-dev \
+    zip \
+    unzip \
+    git \
+    g++
+
+
+############################
+#安装PHP常规扩展
+############################
+
+RUN pecl install mongodb-${MONGODB_VERSION} \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install xsl \
+    && docker-php-ext-install sockets \
+    && docker-php-ext-install sysvsem \
+    && docker-php-ext-install mysqli \
+    && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install bcmath \
+    && docker-php-ext-install soap \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-install gettext \
+    && docker-php-ext-install shmop \
+    && pecl install mcrypt-${MCRYPT_VERSION} \
+    && pecl install redis-${PHPREDIS_VERSION} \
+    && pecl install xdebug-${XDEBUG_VERSION} \
+    && pecl install amqp-${AMQP_VERSION} \
+    && docker-php-ext-enable redis xdebug amqp mcrypt mongodb
+
+############################
+#安装PHP特殊扩展
+############################
+
+RUN curl -fsSL https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz -o swoole.tar.gz \
+    && mkdir -p swoole \
+    && tar -xf swoole.tar.gz -C swoole --strip-components=1 \
+    && rm swoole.tar.gz \
+    && ( \
+        cd swoole \
+        && phpize \
+        && ./configure --enable-swoole \
+        && make -j$(nproc) \
+        && make install \
+    ) \
+    && rm -r swoole \
+    && docker-php-ext-enable swoole
+
+RUN curl -fsSL https://github.com/phalcon/cphalcon/archive/v${PHALCON_VERSION}.tar.gz -o phalcon.tar.gz \
+    && mkdir -p phalcon \
+    && tar -xf phalcon.tar.gz -C phalcon --strip-components=1 \
+    && rm -rf phalcon.tar.gz \
+    && cd phalcon/build \
+    && ./install \
+    && echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/phalcon.ini \
+    && cd ../../ \
+    && rm -r phalcon
+
+############################
+#安装PHP包管理工具composer
+############################
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
+RUN curl -sS https://getcomposer.org/installer | php \
+    && mv composer.phar /usr/local/bin/composer \
+    && chmod a+x /usr/local/bin/composer
+
+############################
+#安装PHP单元测试phpunit
+############################
+
+RUN curl -sS https://phar.phpunit.de/phpunit-${PHPUNIT_VERSION}.phar -o phpunit.phar \
+    && mv phpunit.phar /usr/local/bin/phpunit \
+    && chmod a+x /usr/local/bin/phpunit
+
+############################
+#添加PHP配置
+############################
+ADD xdebug.ini /usr/local/etc/php/conf.d/
