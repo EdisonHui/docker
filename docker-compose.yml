@@ -13,14 +13,13 @@ services:
         MONGODB_VERSION: 1.5.3
         PHALCON_VERSION: 3.4.3
         SWOOLE_VERSION: 4.3.1
-        PHPUNIT_VERSION: 8
+        PHPUNIT_VERSION: 7
     container_name: php
     ports:
       - 9000:9000
-    expose:
-      - 9000
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.9
     restart: always
     volumes:
       - ${DOCUMENT_ROOT}:/data/htdocs
@@ -32,12 +31,9 @@ services:
     container_name: nginx
     ports:
       - 80:80
-      - 443:443
-    expose:
-      - 80
-      - 443
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.8
     restart: always
     volumes:
       - ${DOCUMENT_ROOT}:/data/htdocs
@@ -54,10 +50,9 @@ services:
     container_name: mysql
     ports:
       - 3306:3306
-    expose:
-      - 3306
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.7
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: admin
@@ -70,7 +65,8 @@ services:
     ports:
       - 8080:80
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.6
     environment:
       - PMA_HOST=mysql
       - PMA_PORT=3306
@@ -86,7 +82,8 @@ services:
       - 6379:6379
     container_name: redis
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.5
     restart: always
   rabbitmq:
     build:
@@ -98,7 +95,8 @@ services:
       - 15672:15672
       - 5672:5672
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.4
     container_name: rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: admin
@@ -112,7 +110,8 @@ services:
         MONGO_VERSION: 4.0.6
     restart: always
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.3
     container_name: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -125,7 +124,8 @@ services:
         MONGO_EXPRESS_VERSION: latest
     restart: always
     networks:
-      - dnmp
+      web:
+        ipv4_address:  172.16.238.2
     ports:
       - 8081:8081
     container_name: mongoexpress
@@ -133,4 +133,9 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: admin
 networks:
-  dnmp:
+  web:
+    driver: bridge
+    ipam:
+      config:
+        -
+          subnet: 172.16.238.0/24

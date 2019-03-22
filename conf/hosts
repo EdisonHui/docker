@@ -1,4 +1,4 @@
 # docker环境
-172.18.0.3 	b-local.yunkezan.com
-172.18.0.3  api-local.yunkezan.com
-172.18.0.3  api-activity-local.yunkezan.com
+172.16.238.8  b-local.yunkezan.com
+172.16.238.8  api-local.yunkezan.com
+172.16.238.8  api-activity-local.yunkezan.com
