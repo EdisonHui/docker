@@ -5,6 +5,7 @@ services:
       context: dockerfile/php
       dockerfile: dockerfile
       args:
+        PHP_VERSION: 7.2
         PHPREDIS_VERSION: 4.3.0
         XDEBUG_VERSION: 2.7.0
         AMQP_VERSION: 1.9.4
