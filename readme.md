@@ -26,5 +26,5 @@ sudo systemctl enable docker
 sudo vim /etc/sysctl.conf
 # 写入net.ipv4.ip_forward=1
 # 重启网络
-sudo sysctl net.ipv4.ip_forward
+sudo systemctl restart network
 ```
