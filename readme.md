@@ -7,7 +7,6 @@
 
 #### 加速源配置
 
-- json配置
 ```bash
 # 创建目录
 sudo mkdir -p /etc/docker
@@ -19,4 +18,13 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 # 开机自启
 sudo systemctl enable docker
+```
+
+#### 网络配置
+```bash
+# 修改配置
+sudo vim /etc/sysctl.conf
+# 写入net.ipv4.ip_forward=1
+# 重启网络
+sudo sysctl net.ipv4.ip_forward
 ```
