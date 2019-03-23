@@ -98,7 +98,6 @@ services:
         RABBITMQ_VERSION: 3.7
     ports:
       - 15672:15672
-      - 5672:5672
     networks:
       web:
         ipv4_address:  172.16.238.4
