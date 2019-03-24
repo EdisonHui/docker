@@ -5,62 +5,60 @@ services:
       context: dockerfile/php
       dockerfile: dockerfile
       args:
-        PHP_VERSION: 7.2
-        PHPREDIS_VERSION: 4.3.0
-        XDEBUG_VERSION: 2.7.0
-        AMQP_VERSION: 1.9.4
-        MCRYPT_VERSION: 1.0.2
-        MONGODB_VERSION: 1.5.3
-        PHALCON_VERSION: 3.4.3
-        SWOOLE_VERSION: 4.3.1
-        PHPUNIT_VERSION: 7
-    container_name: php
-    hostname: php
+        PHP_FPM_VERSION: ${PHP_FPM_VERSION}
+        PHPUNIT_VERSION: ${PHPUNIT_VERSION}
+        EXT_PHPREDIS_VERSION: ${EXT_PHPREDIS_VERSION}
+        EXT_XDEBUG_VERSION: ${EXT_XDEBUG_VERSION}
+        EXT_AMQP_VERSION: ${EXT_AMQP_VERSION}
+        EXT_MCRYPT_VERSION: ${EXT_MCRYPT_VERSION}
+        EXT_MONGODB_VERSION: ${EXT_MONGODB_VERSION}
+        EXT_PHALCON_VERSION: ${EXT_PHALCON_VERSION}
+        EXT_SWOOLE_VERSION: ${EXT_SWOOLE_VERSION}
+    container_name: ${CONTAINER_NAME_PHP}
+    hostname: ${HOSTNAME_PHP}
     ports:
       - 9000:9000
     networks:
-      web:
-        ipv4_address:  172.16.238.9
+      docker_web:
+        ipv4_address:  ${NETWORK_IPV4_ADDRESS_PHP}
     restart: always
     volumes:
-      - ${DOCUMENT_ROOT}:/data/htdocs
+      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
       - ./conf/hosts:/etc/hosts:rw
   nginx:
     build:
       context: dockerfile/nginx
       dockerfile: dockerfile
-    container_name: nginx
-    hostname: nginx
+    container_name: ${CONTAINER_NAME_NGINX}
+    hostname: ${HOSTNAME_NGINX}
     ports:
       - 80:80
     networks:
-      web:
-        ipv4_address:  172.16.238.8
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINX}
     restart: always
     volumes:
-      - ${DOCUMENT_ROOT}:/data/htdocs
+      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./conf/nginx/vhost:/etc/nginx/vhost
-    depends_on:
-      - php
   mysql:
     build:
       context: dockerfile/mysql
       dockerfile: dockerfile
       args:
-        MYSQL_VERSION: 5.7
-    container_name: mysql
-    hostname: mysql
+        MYSQL_VERSION: ${MYSQL_VERSION}
+    container_name: ${CONTAINER_NAME_MYSQL}
+    hostname: ${HOSTNAME_MYSQL}
     ports:
       - 3306:3306
     networks:
-      web:
-        ipv4_address:  172.16.238.7
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_MYSQL}
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
-      - ${MYSQL_DATA_ROOT}:/var/lib/mysql
+      - ${MYSQL_DATA_ROOT_DIR}:/var/lib/mysql
   phpmyadmin:
     build:
       context: ./dockerfile/phpmyadmin
@@ -68,81 +66,81 @@ services:
     ports:
       - 8080:80
     networks:
-      web:
-        ipv4_address:  172.16.238.6
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_PHPMYADMIN}
     environment:
-      - PMA_HOST=mysql
-      - PMA_PORT=3306
-    container_name: phpmyadmin
-    hostname: phpmyadmin
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    container_name: ${CONTAINER_NAME_PHPMYADMIN}
+    hostname: ${HOSTNAME_PHPMYADMIN}
     restart: always
   redis:
     build:
       context: ./dockerfile/redis
       dockerfile: dockerfile
       args:
-        REDIS_VERSION: 4
+        REDIS_VERSION: ${REDIS_VERSION}
     ports:
       - 6379:6379
-    container_name: redis
-    hostname: redis
+    container_name: ${CONTAINER_NAME_REDIS}
+    hostname: ${HOSTNAME_REDIS}
     networks:
-      web:
-        ipv4_address:  172.16.238.5
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_REDIS}
     restart: always
   rabbitmq:
     build:
       context: ./dockerfile/rabbitmq
       dockerfile: dockerfile
       args:
-        RABBITMQ_VERSION: 3.7
+        RABBITMQ_VERSION: ${RABBITMQ_VERSION}
     ports:
       - 15672:15672
     networks:
-      web:
-        ipv4_address:  172.16.238.4
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_RABBITMQ}
     container_name: rabbitmq
     hostname: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     restart: always
   mongo:
     build:
       context: ./dockerfile/mongo
       dockerfile: dockerfile
       args:
-        MONGO_VERSION: 4.0.6
+        MONGO_VERSION: ${MONGO_VERSION}
     restart: always
     networks:
-      web:
-        ipv4_address:  172.16.238.3
-    container_name: mongo
-    hostname: mongo
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO}
+    container_name: ${CONTAINER_NAME_MONGO}
+    hostname: ${HOSTNAME_MONGO}
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
   mongoexpress:
     build:
       context: ./dockerfile/mongoexpress
       dockerfile: dockerfile
       args:
-        MONGO_EXPRESS_VERSION: latest
+        MONGO_EXPRESS_VERSION: ${MONGO_EXPRESS_VERSION}
     restart: always
     networks:
-      web:
-        ipv4_address:  172.16.238.2
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO_EXPRESS}
     ports:
       - 8081:8081
-    container_name: mongoexpress
-    hostname: mongoexpress
+    container_name: ${CONTAINER_NAME_MONGO_EXPRESS}
+    hostname: ${HOSTNAME_MONGO_EXPRESS}
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
 networks:
-  web:
-    driver: bridge
+  docker_web:
+    driver: ${NETWORK_WEB_DEFAULT_DRIVER}
     ipam:
       config:
         -
-          subnet: 172.16.238.0/24
+          subnet: ${NETWORK_WEB_SUBNET}
