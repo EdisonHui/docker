@@ -117,6 +117,8 @@ services:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO}
     container_name: ${CONTAINER_NAME_MONGO}
     hostname: ${HOSTNAME_MONGO}
+    volumes:
+      - ${MONGO_DATA_ROOT_DIR}:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
