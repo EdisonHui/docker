@@ -40,15 +40,28 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     g++ \
-    wget \
-    vim
+    bzip2 \
+    libbz2-dev \
+    libenchant-dev \
+    libtidy-dev \
+    librecode-dev \
+    libpspell-dev
 
 
 ############################
 #安装PHP常规扩展
 ############################
 
-RUN docker-php-ext-install wddx \
+RUN docker-php-ext-install tidy \
+    && docker-php-ext-install recode \
+    && docker-php-ext-install pspell \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-install enchant \
+    && docker-php-ext-install dba \
+    && docker-php-ext-install bz2 \
+    && docker-php-ext-install pgsql \
+    && docker-php-ext-install pdo_pgsql \
+    && docker-php-ext-install wddx \
     && docker-php-ext-install sysvmsg \
     && docker-php-ext-install sysvshm \
     && docker-php-ext-install pcntl \
