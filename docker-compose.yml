@@ -16,8 +16,6 @@ services:
         EXT_SWOOLE_VERSION: ${EXT_SWOOLE_VERSION}
     container_name: ${CONTAINER_NAME_PHP}
     hostname: ${HOSTNAME_PHP}
-    ports:
-      - 9000:9000
     networks:
       docker_web:
         ipv4_address:  ${NETWORK_IPV4_ADDRESS_PHP}
@@ -80,8 +78,6 @@ services:
       dockerfile: dockerfile
       args:
         REDIS_VERSION: ${REDIS_VERSION}
-    ports:
-      - 6379:6379
     container_name: ${CONTAINER_NAME_REDIS}
     hostname: ${HOSTNAME_REDIS}
     networks:
@@ -139,6 +135,54 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
+  elasticsearch:
+    build:
+      context: build/elasticsearch
+      dockerfile: dockerfile
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+    restart: always
+    networks:
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_ELASTICSEARCH}
+    ports:
+      - 9200:9200
+    container_name: ${CONTAINER_NAME_ELASTICSEARCH}
+    hostname: ${HOSTNAME_ELASTICSEARCH}
+    environment:
+      - cluster.name=admin
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+  kibana:
+    build:
+      context: ./build/kibana
+      dockerfile: dockerfile
+      args:
+        KIBANA_VERSION: ${KIBANA_VERSION}
+    container_name: ${CONTAINER_NAME_KIBANA}
+    hostname: ${HOSTNAME_KIBANA}
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_KIBANA}
+  logstash:
+    build:
+      context: ./build/logstash
+      dockerfile: dockerfile
+      args:
+        LOGSTASH_VERSION: ${LOGSTASH_VERSION}
+    container_name: ${CONTAINER_NAME_LOGSTASH}
+    hostname: ${HOSTNAME_LOGSTASH}
+    networks:
+      docker_web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_LOGSTASH}
 networks:
   docker_web:
     driver: ${NETWORK_WEB_DEFAULT_DRIVER}
