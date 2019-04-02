@@ -2,7 +2,7 @@ version: "3"
 services:
   php:
     build:
-      context: dockerfile/php
+      context: build/php
       dockerfile: dockerfile
       args:
         PHP_FPM_VERSION: ${PHP_FPM_VERSION}
@@ -27,7 +27,7 @@ services:
       - ./conf/hosts:/etc/hosts:rw
   nginx:
     build:
-      context: dockerfile/nginx
+      context: build/nginx
       dockerfile: dockerfile
     container_name: ${CONTAINER_NAME_NGINX}
     hostname: ${HOSTNAME_NGINX}
@@ -43,7 +43,7 @@ services:
       - ./conf/nginx/vhost:/etc/nginx/vhost
   mysql:
     build:
-      context: dockerfile/mysql
+      context: build/mysql
       dockerfile: dockerfile
       args:
         MYSQL_VERSION: ${MYSQL_VERSION}
@@ -61,7 +61,7 @@ services:
       - ${MYSQL_DATA_ROOT_DIR}:/var/lib/mysql
   phpmyadmin:
     build:
-      context: ./dockerfile/phpmyadmin
+      context: build/phpmyadmin
       dockerfile: dockerfile
     ports:
       - 8080:80
@@ -76,7 +76,7 @@ services:
     restart: always
   redis:
     build:
-      context: ./dockerfile/redis
+      context: build/redis
       dockerfile: dockerfile
       args:
         REDIS_VERSION: ${REDIS_VERSION}
@@ -90,7 +90,7 @@ services:
     restart: always
   rabbitmq:
     build:
-      context: ./dockerfile/rabbitmq
+      context: build/rabbitmq
       dockerfile: dockerfile
       args:
         RABBITMQ_VERSION: ${RABBITMQ_VERSION}
@@ -107,7 +107,7 @@ services:
     restart: always
   mongo:
     build:
-      context: ./dockerfile/mongo
+      context: build/mongo
       dockerfile: dockerfile
       args:
         MONGO_VERSION: ${MONGO_VERSION}
@@ -124,7 +124,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
   mongoexpress:
     build:
-      context: ./dockerfile/mongoexpress
+      context: build/mongoexpress
       dockerfile: dockerfile
       args:
         MONGO_EXPRESS_VERSION: ${MONGO_EXPRESS_VERSION}

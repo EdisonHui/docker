@@ -36,9 +36,8 @@ RUN apt-get update && apt-get install -y \
     openssl \
     libssl-dev \
     libxslt-dev \
-    zip \
-    unzip \
     git \
+    wget \
     g++ \
     bzip2 \
     libbz2-dev \
@@ -119,7 +118,6 @@ RUN curl -fsSL https://github.com/phalcon/cphalcon/archive/v${EXT_PHALCON_VERSIO
 #安装PHP包管理工具composer
 ############################
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN curl -fsSL https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer \
     && chmod a+x /usr/local/bin/composer \

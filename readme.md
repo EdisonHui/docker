@@ -25,6 +25,7 @@ sudo systemctl enable docker
 # 修改配置
 sudo vim /etc/sysctl.conf
 # 写入net.ipv4.ip_forward=1
-# 重启网络
-sudo systemctl restart network
+# 写入vm.max_map_count=262144
+# 重启机器
+sodo reboot
 ```
