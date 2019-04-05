@@ -131,8 +131,3 @@ RUN pecl install mcrypt-${EXT_MCRYPT_VERSION} \
     && docker-php-ext-install opcache \
     && docker-php-ext-install gettext \
     && docker-php-ext-install shmop
-
-############################
-#添加PHP配置
-############################
-ADD extend.ini /usr/local/etc/php/conf.d/

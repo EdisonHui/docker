@@ -22,7 +22,8 @@ services:
     restart: always
     volumes:
       - ${WEB_DATA_ROOT_DIR}:/data/htdocs
-      - ./conf/hosts:/etc/hosts:rw
+      - ./conf/hosts:/etc/hosts
+      - ./conf/php/extend.ini:/usr/local/etc/php/conf.d/extend.ini
   nginx:
     build:
       context: build/nginx
@@ -165,6 +166,7 @@ services:
         KIBANA_VERSION: ${KIBANA_VERSION}
     container_name: ${CONTAINER_NAME_KIBANA}
     hostname: ${HOSTNAME_KIBANA}
+    restart: always
     ports:
       - 5601:5601
     depends_on:
@@ -183,6 +185,7 @@ services:
         - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
     container_name: ${CONTAINER_NAME_LOGSTASH}
     hostname: ${HOSTNAME_LOGSTASH}
+    restart: always
     networks:
       docker_web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_LOGSTASH}
