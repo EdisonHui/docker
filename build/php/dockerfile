@@ -90,7 +90,9 @@ RUN apt-get update && apt-get install -y \
     libenchant-dev \
     libtidy-dev \
     librecode-dev \
-    libpspell-dev
+    libpspell-dev \
+    zip \
+    unzip
 
 
 ############################
