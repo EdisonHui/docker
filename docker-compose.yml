@@ -178,6 +178,9 @@ services:
       dockerfile: dockerfile
       args:
         LOGSTASH_VERSION: ${LOGSTASH_VERSION}
+    volumes:
+        - ./conf/logstash/config:/usr/share/logstash/config
+        - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
     container_name: ${CONTAINER_NAME_LOGSTASH}
     hostname: ${HOSTNAME_LOGSTASH}
     networks:
