@@ -89,8 +89,6 @@ services:
     build:
       context: build/rabbitmq
       dockerfile: dockerfile
-      args:
-        RABBITMQ_VERSION: ${RABBITMQ_VERSION}
     ports:
       - 15672:15672
     networks:
@@ -106,8 +104,6 @@ services:
     build:
       context: build/mongo
       dockerfile: dockerfile
-      args:
-        MONGO_VERSION: ${MONGO_VERSION}
     restart: always
     networks:
       docker_web:
@@ -123,8 +119,6 @@ services:
     build:
       context: build/mongoexpress
       dockerfile: dockerfile
-      args:
-        MONGO_EXPRESS_VERSION: ${MONGO_EXPRESS_VERSION}
     restart: always
     networks:
       docker_web:

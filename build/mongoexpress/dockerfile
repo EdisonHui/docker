@@ -1,2 +1,1 @@
-ARG  MONGO_EXPRESS_VERSION
-FROM mongo-express:${MONGO_EXPRESS_VERSION}
+FROM mongo-express:latest
