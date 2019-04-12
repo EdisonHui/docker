@@ -13,7 +13,7 @@ services:
     container_name: ${CONTAINER_NAME_PHP}
     hostname: ${HOSTNAME_PHP}
     networks:
-      docker_web:
+      web:
         ipv4_address:  ${NETWORK_IPV4_ADDRESS_PHP}
     restart: always
     volumes:
@@ -29,7 +29,7 @@ services:
     ports:
       - 80:80
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINX}
     restart: always
     volumes:
@@ -47,7 +47,7 @@ services:
     ports:
       - 3306:3306
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_MYSQL}
     restart: always
     environment:
@@ -61,7 +61,7 @@ services:
     ports:
       - 8080:80
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_PHPMYADMIN}
     environment:
       PMA_HOST: mysql
@@ -78,7 +78,7 @@ services:
     container_name: ${CONTAINER_NAME_REDIS}
     hostname: ${HOSTNAME_REDIS}
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_REDIS}
     restart: always
   rabbitmq:
@@ -88,7 +88,7 @@ services:
     ports:
       - 15672:15672
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_RABBITMQ}
     container_name: rabbitmq
     hostname: rabbitmq
@@ -102,7 +102,7 @@ services:
       dockerfile: dockerfile
     restart: always
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO}
     container_name: ${CONTAINER_NAME_MONGO}
     hostname: ${HOSTNAME_MONGO}
@@ -117,7 +117,7 @@ services:
       dockerfile: dockerfile
     restart: always
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO_EXPRESS}
     ports:
       - 8081:8081
@@ -134,7 +134,7 @@ services:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
     restart: always
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_ELASTICSEARCH}
     ports:
       - 9200:9200
@@ -162,7 +162,7 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_KIBANA}
   logstash:
     build:
@@ -177,10 +177,10 @@ services:
     hostname: ${HOSTNAME_LOGSTASH}
     restart: always
     networks:
-      docker_web:
+      web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_LOGSTASH}
 networks:
-  docker_web:
+  web:
     driver: ${NETWORK_WEB_DEFAULT_DRIVER}
     ipam:
       config:
