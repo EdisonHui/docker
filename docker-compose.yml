@@ -12,6 +12,8 @@ services:
         EXT_SWOOLE_VERSION: ${EXT_SWOOLE_VERSION}
     container_name: ${CONTAINER_NAME_PHP}
     hostname: ${HOSTNAME_PHP}
+    expose:
+      - 9000
     networks:
       web:
         ipv4_address:  ${NETWORK_IPV4_ADDRESS_PHP}
@@ -20,17 +22,57 @@ services:
       - ${WEB_DATA_ROOT_DIR}:/data/htdocs
       - ./conf/hosts:/etc/hosts
       - ./conf/php/extend.ini:/usr/local/etc/php/conf.d/extend.ini
-  nginx:
+  nginxproxy:
     build:
       context: build/nginx
       dockerfile: dockerfile
-    container_name: ${CONTAINER_NAME_NGINX}
-    hostname: ${HOSTNAME_NGINX}
+    container_name: ${CONTAINER_NAME_NGINXPROXY}
+    hostname: ${HOSTNAME_NGINXPROXY}
     ports:
       - 80:80
     networks:
       web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINX}
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINXPROXY}
+    restart: always
+    volumes:
+      - ./conf/nginxproxy/nginx.conf:/etc/nginx/nginx.conf
+  nginxnode1:
+    build:
+      context: build/nginx
+      dockerfile: dockerfile
+    container_name: ${CONTAINER_NAME_NGINXNODE1}
+    hostname: ${HOSTNAME_NGINXNODE1}
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINXNODE1}
+    restart: always
+    volumes:
+      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/vhost:/etc/nginx/vhost
+  nginxnode2:
+    build:
+      context: build/nginx
+      dockerfile: dockerfile
+    container_name: ${CONTAINER_NAME_NGINXNODE2}
+    hostname: ${HOSTNAME_NGINXNODE2}
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINXNODE2}
+    restart: always
+    volumes:
+      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/vhost:/etc/nginx/vhost
+  nginxnode3:
+    build:
+      context: build/nginx
+      dockerfile: dockerfile
+    container_name: ${CONTAINER_NAME_NGINXNODE3}
+    hostname: ${HOSTNAME_NGINXNODE3}
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINXNODE3}
     restart: always
     volumes:
       - ${WEB_DATA_ROOT_DIR}:/data/htdocs
@@ -171,8 +213,8 @@ services:
       args:
         LOGSTASH_VERSION: ${LOGSTASH_VERSION}
     volumes:
-        - ./conf/logstash/config:/usr/share/logstash/config
-        - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./conf/logstash/config:/usr/share/logstash/config
+      - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
     container_name: ${CONTAINER_NAME_LOGSTASH}
     hostname: ${HOSTNAME_LOGSTASH}
     restart: always
