@@ -78,6 +78,149 @@ services:
       - ${WEB_DATA_ROOT_DIR}:/data/htdocs
       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./conf/nginx/vhost:/etc/nginx/vhost
+  mysql:
+    build:
+      context: build/mysql
+      dockerfile: dockerfile
+      args:
+        MYSQL_VERSION: ${MYSQL_VERSION}
+    container_name: ${CONTAINER_NAME_MYSQL}
+    hostname: ${HOSTNAME_MYSQL}
+    ports:
+      - 3306:3306
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_MYSQL}
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ${MYSQL_DATA_ROOT_DIR}:/var/lib/mysql
+  phpmyadmin:
+    build:
+      context: build/phpmyadmin
+      dockerfile: dockerfile
+    ports:
+      - 8080:80
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_PHPMYADMIN}
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    container_name: ${CONTAINER_NAME_PHPMYADMIN}
+    hostname: ${HOSTNAME_PHPMYADMIN}
+    restart: always
+  redis:
+    build:
+      context: build/redis
+      dockerfile: dockerfile
+      args:
+        REDIS_VERSION: ${REDIS_VERSION}
+    container_name: ${CONTAINER_NAME_REDIS}
+    hostname: ${HOSTNAME_REDIS}
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_REDIS}
+    restart: always
+  rabbitmq:
+    build:
+      context: build/rabbitmq
+      dockerfile: dockerfile
+    ports:
+      - 15672:15672
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_RABBITMQ}
+    container_name: rabbitmq
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    restart: always
+  mongo:
+    build:
+      context: build/mongo
+      dockerfile: dockerfile
+    restart: always
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO}
+    container_name: ${CONTAINER_NAME_MONGO}
+    hostname: ${HOSTNAME_MONGO}
+    volumes:
+      - ${MONGO_DATA_ROOT_DIR}:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  mongoexpress:
+    build:
+      context: build/mongoexpress
+      dockerfile: dockerfile
+    restart: always
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO_EXPRESS}
+    ports:
+      - 8081:8081
+    container_name: ${CONTAINER_NAME_MONGO_EXPRESS}
+    hostname: ${HOSTNAME_MONGO_EXPRESS}
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  elasticsearch:
+    build:
+      context: build/elasticsearch
+      dockerfile: dockerfile
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+    restart: always
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_ELASTICSEARCH}
+    ports:
+      - 9200:9200
+    container_name: ${CONTAINER_NAME_ELASTICSEARCH}
+    hostname: ${HOSTNAME_ELASTICSEARCH}
+    environment:
+      - cluster.name=admin
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+  kibana:
+    build:
+      context: ./build/kibana
+      dockerfile: dockerfile
+      args:
+        KIBANA_VERSION: ${KIBANA_VERSION}
+    container_name: ${CONTAINER_NAME_KIBANA}
+    hostname: ${HOSTNAME_KIBANA}
+    restart: always
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_KIBANA}
+  logstash:
+    build:
+      context: ./build/logstash
+      dockerfile: dockerfile
+      args:
+        LOGSTASH_VERSION: ${LOGSTASH_VERSION}
+    volumes:
+      - ./conf/logstash/config:/usr/share/logstash/config
+      - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
+    container_name: ${CONTAINER_NAME_LOGSTASH}
+    hostname: ${HOSTNAME_LOGSTASH}
+    restart: always
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_LOGSTASH}
 networks:
   web:
     driver: ${NETWORK_WEB_DEFAULT_DRIVER}
