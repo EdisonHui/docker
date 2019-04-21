@@ -12,6 +12,92 @@ ARG EXT_SWOOLE_VERSION
 ARG EXT_MCRYPT_VERSION
 
 ############################
+#安装PHP依赖
+############################
+
+RUN sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list
+RUN sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list
+
+RUN apt-get update && apt-get install -y \
+    libgmp-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    librabbitmq-dev \
+    libmcrypt-dev \
+    libpq-dev \
+    libicu-dev \
+    libxml2-dev \
+    zlib1g-dev \
+    openssl \
+    libssl-dev \
+    libxslt-dev \
+    g++ \
+    bzip2 \
+    libbz2-dev \
+    libenchant-dev \
+    libtidy-dev \
+    librecode-dev \
+    libpspell-dev \
+    cmake \
+    zip \
+    unzip \
+    wget \
+    git \
+    vim
+RUN curl -fsSL https://libzip.org/download/libzip-1.5.2.tar.gz -o libzip.tar.gz \
+    && mkdir -p libzip \
+    && tar -xf libzip.tar.gz -C libzip --strip-components=1 \
+    && rm -rf libzip.tar.gz \
+    && cd libzip \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make \
+    && make install
+
+############################
+#安装PHP常规扩展
+############################
+
+RUN pecl install mcrypt-${EXT_MCRYPT_VERSION} \
+    && pecl install redis \
+    && pecl install xdebug \
+    && pecl install amqp \
+    && pecl install mongodb \
+    && docker-php-ext-enable redis xdebug amqp mcrypt mongodb \
+    && docker-php-ext-configure zip --with-libzip=/usr/include/ \
+    && docker-php-ext-install zip \
+    && docker-php-ext-install tidy \
+    && docker-php-ext-install recode \
+    && docker-php-ext-install pspell \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-install enchant \
+    && docker-php-ext-install dba \
+    && docker-php-ext-install bz2 \
+    && docker-php-ext-install pgsql \
+    && docker-php-ext-install pdo_pgsql \
+    && docker-php-ext-install wddx \
+    && docker-php-ext-install sysvmsg \
+    && docker-php-ext-install sysvshm \
+    && docker-php-ext-install pcntl \
+    && docker-php-ext-install gmp \
+    && docker-php-ext-install exif \
+    && docker-php-ext-install calendar \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install xsl \
+    && docker-php-ext-install sockets \
+    && docker-php-ext-install sysvsem \
+    && docker-php-ext-install mysqli \
+    && docker-php-ext-install pdo_mysql \
+    && docker-php-ext-install bcmath \
+    && docker-php-ext-install soap \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-install gettext \
+    && docker-php-ext-install shmop
+
+############################
 #安装PHP包管理工具composer
 ############################
 
@@ -56,76 +142,3 @@ RUN curl -fsSL https://github.com/phalcon/cphalcon/archive/v${EXT_PHALCON_VERSIO
     && echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/phalcon.ini \
     && cd ../../ \
     && rm -r phalcon
-
-############################
-#安装PHP依赖
-############################
-
-RUN sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list
-RUN sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list
-
-RUN apt-get update && apt-get install -y \
-    libgmp-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    librabbitmq-dev \
-    libmcrypt-dev \
-    libpq-dev \
-    libicu-dev \
-    libxml2-dev \
-    zlib1g-dev \
-    openssl \
-    libssl-dev \
-    libxslt-dev \
-    git \
-    wget \
-    g++ \
-    bzip2 \
-    libbz2-dev \
-    libenchant-dev \
-    libtidy-dev \
-    librecode-dev \
-    libpspell-dev \
-    zip \
-    unzip
-
-
-############################
-#安装PHP常规扩展
-############################
-
-RUN pecl install mcrypt-${EXT_MCRYPT_VERSION} \
-    && pecl install redis \
-    && pecl install xdebug \
-    && pecl install amqp \
-    && pecl install mongodb \
-    && docker-php-ext-enable redis xdebug amqp mcrypt mongodb \
-    && docker-php-ext-install tidy \
-    && docker-php-ext-install recode \
-    && docker-php-ext-install pspell \
-    && docker-php-ext-install opcache \
-    && docker-php-ext-install enchant \
-    && docker-php-ext-install dba \
-    && docker-php-ext-install bz2 \
-    && docker-php-ext-install pgsql \
-    && docker-php-ext-install pdo_pgsql \
-    && docker-php-ext-install wddx \
-    && docker-php-ext-install sysvmsg \
-    && docker-php-ext-install sysvshm \
-    && docker-php-ext-install pcntl \
-    && docker-php-ext-install gmp \
-    && docker-php-ext-install exif \
-    && docker-php-ext-install calendar \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install xsl \
-    && docker-php-ext-install sockets \
-    && docker-php-ext-install sysvsem \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install bcmath \
-    && docker-php-ext-install soap \
-    && docker-php-ext-install opcache \
-    && docker-php-ext-install gettext \
-    && docker-php-ext-install shmop
