@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     git \
     vim
-RUN curl -fsSL https://libzip.org/download/libzip-1.5.2.tar.gz -o libzip.tar.gz \
+RUN curl -fsSL https://github.com/nih-at/libzip/archive/rel-1-5-2.tar.gz -o libzip.tar.gz \
     && mkdir -p libzip \
     && tar -xf libzip.tar.gz -C libzip --strip-components=1 \
     && rm -rf libzip.tar.gz \
@@ -60,14 +60,14 @@ RUN curl -fsSL https://libzip.org/download/libzip-1.5.2.tar.gz -o libzip.tar.gz 
 #安装PHP常规扩展
 ############################
 
-RUN pecl install mcrypt-${EXT_MCRYPT_VERSION} \
+RUN docker-php-ext-configure zip --with-libzip=/usr/include/ \
+    && docker-php-ext-install zip \
+    && pecl install mcrypt-${EXT_MCRYPT_VERSION} \
     && pecl install redis \
     && pecl install xdebug \
     && pecl install amqp \
     && pecl install mongodb \
     && docker-php-ext-enable redis xdebug amqp mcrypt mongodb \
-    && docker-php-ext-configure zip --with-libzip=/usr/include/ \
-    && docker-php-ext-install zip \
     && docker-php-ext-install tidy \
     && docker-php-ext-install recode \
     && docker-php-ext-install pspell \
