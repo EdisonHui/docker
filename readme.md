@@ -14,14 +14,6 @@ sudo mkdir -p /etc/docker
 sudo vim /etc/docker/daemon.json
 # 重新载入
 sudo systemctl daemon-reload
-# 重启服务
-sudo systemctl restart docker
-# 开机自启
-sudo systemctl enable docker
-```
-
-#### 网络配置
-```bash
 # 修改配置
 sudo vim /etc/sysctl.conf
 # 写入net.ipv4.ip_forward=1
@@ -31,3 +23,8 @@ sudo systemctl enable docker
 # 重启机器
 sodo reboot
 ```
+
+#### 配置
+
+- 不需要使用xdebug的去除PHP dockerfile的xdebug安装
+- PHP/extend.ini中xdebug远程调试地址配置成自己的主机IP

@@ -14,6 +14,8 @@ services:
     hostname: ${HOSTNAME_PHP}
     expose:
       - 9000
+    ports:
+      - 9001:9001
     networks:
       web:
         ipv4_address:  ${NETWORK_IPV4_ADDRESS_PHP}
