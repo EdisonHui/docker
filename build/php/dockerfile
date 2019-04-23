@@ -60,14 +60,15 @@ RUN curl -fsSL https://github.com/nih-at/libzip/archive/rel-1-5-2.tar.gz -o libz
 #安装PHP常规扩展
 ############################
 
-RUN docker-php-ext-configure zip --with-libzip=/usr/include/ \
+RUN pecl install redis \ 
+    && docker-php-ext-configure zip --with-libzip=/usr/include/ \
     && docker-php-ext-install zip \
     && pecl install mcrypt-${EXT_MCRYPT_VERSION} \
-    && pecl install redis \
+    && pecl install apcu \
     && pecl install xdebug \
     && pecl install amqp \
     && pecl install mongodb \
-    && docker-php-ext-enable redis xdebug amqp mcrypt mongodb \
+    && docker-php-ext-enable redis xdebug amqp mcrypt mongodb apcu \
     && docker-php-ext-install tidy \
     && docker-php-ext-install recode \
     && docker-php-ext-install pspell \
