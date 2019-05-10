@@ -21,7 +21,7 @@ sudo vim /etc/sysctl.conf
 # 开机自启
 sudo systemctl enable docker
 # 重启机器
-sodo reboot
+sudo reboot
 ```
 
 #### 配置
