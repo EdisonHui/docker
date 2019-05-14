@@ -121,6 +121,8 @@ services:
         REDIS_VERSION: ${REDIS_VERSION}
     container_name: ${CONTAINER_NAME_REDIS}
     hostname: ${HOSTNAME_REDIS}
+    ports:
+      - 6379:6379
     networks:
       web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_REDIS}
