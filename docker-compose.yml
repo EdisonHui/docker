@@ -147,6 +147,8 @@ services:
       context: build/mongo
       dockerfile: dockerfile
     restart: always
+    ports:
+      - 27017:27017
     networks:
       web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO}
