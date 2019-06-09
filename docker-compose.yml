@@ -12,8 +12,6 @@ services:
         EXT_SWOOLE_VERSION: ${EXT_SWOOLE_VERSION}
     container_name: ${CONTAINER_NAME_PHP}
     hostname: ${HOSTNAME_PHP}
-    expose:
-      - 9000
     ports:
       - 9001:9001
     networks:
@@ -38,43 +36,15 @@ services:
     restart: always
     volumes:
       - ./conf/nginxproxy/nginx.conf:/etc/nginx/nginx.conf
-  nginxnode1:
+  nginx:
     build:
       context: build/nginx
       dockerfile: dockerfile
-    container_name: ${CONTAINER_NAME_NGINXNODE1}
-    hostname: ${HOSTNAME_NGINXNODE1}
+    container_name: ${CONTAINER_NAME_NGINX}
+    hostname: ${HOSTNAME_NGINX}
     networks:
       web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINXNODE1}
-    restart: always
-    volumes:
-      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
-      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./conf/nginx/vhost:/etc/nginx/vhost
-  nginxnode2:
-    build:
-      context: build/nginx
-      dockerfile: dockerfile
-    container_name: ${CONTAINER_NAME_NGINXNODE2}
-    hostname: ${HOSTNAME_NGINXNODE2}
-    networks:
-      web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINXNODE2}
-    restart: always
-    volumes:
-      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
-      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./conf/nginx/vhost:/etc/nginx/vhost
-  nginxnode3:
-    build:
-      context: build/nginx
-      dockerfile: dockerfile
-    container_name: ${CONTAINER_NAME_NGINXNODE3}
-    hostname: ${HOSTNAME_NGINXNODE3}
-    networks:
-      web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINXNODE3}
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_NGINX}
     restart: always
     volumes:
       - ${WEB_DATA_ROOT_DIR}:/data/htdocs
@@ -98,21 +68,6 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - ${MYSQL_DATA_ROOT_DIR}:/var/lib/mysql
-  phpmyadmin:
-    build:
-      context: build/phpmyadmin
-      dockerfile: dockerfile
-    ports:
-      - 8080:80
-    networks:
-      web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_PHPMYADMIN}
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-    container_name: ${CONTAINER_NAME_PHPMYADMIN}
-    hostname: ${HOSTNAME_PHPMYADMIN}
-    restart: always
   redis:
     build:
       context: build/redis
@@ -142,38 +97,23 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     restart: always
-  mongo:
+  mongodb:
     build:
-      context: build/mongo
+      context: build/mongodb
       dockerfile: dockerfile
     restart: always
     ports:
       - 27017:27017
     networks:
       web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO}
-    container_name: ${CONTAINER_NAME_MONGO}
-    hostname: ${HOSTNAME_MONGO}
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGODB}
+    container_name: ${CONTAINER_NAME_MONGODB}
+    hostname: ${HOSTNAME_MONGODB}
     volumes:
-      - ${MONGO_DATA_ROOT_DIR}:/data/db
+      - ${MONGODB_DATA_ROOT_DIR}:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-  mongoexpress:
-    build:
-      context: build/mongoexpress
-      dockerfile: dockerfile
-    restart: always
-    networks:
-      web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_MONGO_EXPRESS}
-    ports:
-      - 8081:8081
-    container_name: ${CONTAINER_NAME_MONGO_EXPRESS}
-    hostname: ${HOSTNAME_MONGO_EXPRESS}
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
   elasticsearch:
     build:
       context: build/elasticsearch
@@ -196,6 +136,21 @@ services:
       memlock:
         soft: -1
         hard: -1
+  logstash:
+    build:
+      context: ./build/logstash
+      dockerfile: dockerfile
+      args:
+        LOGSTASH_VERSION: ${LOGSTASH_VERSION}
+    volumes:
+      - ./conf/logstash/config:/usr/share/logstash/config
+      - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
+    container_name: ${CONTAINER_NAME_LOGSTASH}
+    hostname: ${HOSTNAME_LOGSTASH}
+    restart: always
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_LOGSTASH}
   kibana:
     build:
       context: ./build/kibana
@@ -212,21 +167,6 @@ services:
     networks:
       web:
         ipv4_address: ${NETWORK_IPV4_ADDRESS_KIBANA}
-  logstash:
-    build:
-      context: ./build/logstash
-      dockerfile: dockerfile
-      args:
-        LOGSTASH_VERSION: ${LOGSTASH_VERSION}
-    volumes:
-      - ./conf/logstash/config:/usr/share/logstash/config
-      - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
-    container_name: ${CONTAINER_NAME_LOGSTASH}
-    hostname: ${HOSTNAME_LOGSTASH}
-    restart: always
-    networks:
-      web:
-        ipv4_address: ${NETWORK_IPV4_ADDRESS_LOGSTASH}
 networks:
   web:
     driver: ${NETWORK_WEB_DEFAULT_DRIVER}
