@@ -112,6 +112,59 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  elasticsearch:
+    build:
+      context: build/elasticsearch
+      dockerfile: dockerfile
+      args:
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION}
+    restart: always
+    networks:
+      web:
+        ipv4_address: ${NETWORK_IPV4_ADDRESS_ELASTICSEARCH}
+    ports:
+      - 9200:9200
+    container_name: ${CONTAINER_NAME_ELASTICSEARCH}
+    hostname: ${HOSTNAME_ELASTICSEARCH}
+    environment:
+      - cluster.name=admin
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+  logstash:
+      build:
+        context: ./build/logstash
+        dockerfile: dockerfile
+        args:
+          LOGSTASH_VERSION: ${LOGSTASH_VERSION}
+      volumes:
+        - ./conf/logstash/config:/usr/share/logstash/config
+        - ./conf/logstash/pipeline:/usr/share/logstash/pipeline
+      container_name: ${CONTAINER_NAME_LOGSTASH}
+      hostname: ${HOSTNAME_LOGSTASH}
+      restart: always
+      networks:
+        web:
+          ipv4_address: ${NETWORK_IPV4_ADDRESS_LOGSTASH}
+  kibana:
+      build:
+        context: ./build/kibana
+        dockerfile: dockerfile
+        args:
+          KIBANA_VERSION: ${KIBANA_VERSION}
+      container_name: ${CONTAINER_NAME_KIBANA}
+      hostname: ${HOSTNAME_KIBANA}
+      restart: always
+      ports:
+        - 5601:5601
+      depends_on:
+        - elasticsearch
+      networks:
+        web:
+          ipv4_address: ${NETWORK_IPV4_ADDRESS_KIBANA}
 networks:
   web:
     driver: ${NETWORK_WEB_DEFAULT_DRIVER}
