@@ -22,7 +22,6 @@ RUN apt-get update && apt-get install -y \
     libjpeg62-turbo-dev \
     libpng-dev \
     librabbitmq-dev \
-    libmcrypt-dev \
     libpq-dev \
     libicu-dev \
     libxml2-dev \
@@ -57,7 +56,8 @@ RUN curl -fsSL https://github.com/nih-at/libzip/archive/rel-1-5-2.tar.gz -o libz
 #安装PHP常规扩展
 ############################
 
-RUN docker-php-ext-install sockets \
+RUN pecl channel-update pecl.php.net \ 
+    && docker-php-ext-install sockets \
     && pecl install swoole \
     && docker-php-ext-configure zip --with-libzip=/usr/include/ \
     && docker-php-ext-install zip \
@@ -106,7 +106,7 @@ RUN curl -fsSL https://getcomposer.org/installer | php \
 #安装PHP单元测试phpunit
 ############################
 
-RUN curl -fsSL https://phar.phpunit.de/phpunit-${PHPUNIT_VERSION}.phar -o phpunit \
+RUN curl -fsSL http://phar.phpunit.cn/phpunit.phar -o phpunit \
     && mv phpunit /usr/local/bin/phpunit \
     && chmod +x /usr/local/bin/phpunit
 
