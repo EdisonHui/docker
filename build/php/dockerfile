@@ -4,12 +4,6 @@ FROM php:${PHP_FPM_VERSION}-fpm
 RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
 
 ############################
-#定义PHP相关扩展版本号
-############################
-ARG PHPUNIT_VERSION
-ARG EXT_PHALCON_VERSION
-
-############################
 #安装PHP依赖
 ############################
 
@@ -17,80 +11,30 @@ RUN sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list
 RUN sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list
 
 RUN apt-get update && apt-get install -y \
-    libgmp-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
-    librabbitmq-dev \
     libpq-dev \
-    libicu-dev \
-    libxml2-dev \
-    zlib1g-dev \
-    openssl \
-    libssl-dev \
-    g++ \
-    bzip2 \
-    libbz2-dev \
-    libenchant-dev \
-    libtidy-dev \
-    librecode-dev \
-    libpspell-dev \
-    cmake \
+    librabbitmq-dev \
     zip \
-    unzip \
-    wget \
-    git \
-    vim
-RUN curl -fsSL https://github.com/nih-at/libzip/archive/rel-1-5-2.tar.gz -o libzip.tar.gz \
-    && mkdir -p libzip \
-    && tar -xf libzip.tar.gz -C libzip --strip-components=1 \
-    && rm -rf libzip.tar.gz \
-    && cd libzip \
-    && mkdir build \
-    && cd build \
-    && cmake .. \
-    && make \
-    && make install
+    unzip
 
 ############################
 #安装PHP常规扩展
 ############################
 
 RUN pecl channel-update pecl.php.net \ 
-    && docker-php-ext-install sockets \
     && pecl install swoole \
-    && docker-php-ext-configure zip --with-libzip=/usr/include/ \
-    && docker-php-ext-install zip \
     && pecl install redis \
     && pecl install apcu \
     && pecl install xdebug \
     && pecl install amqp \
     && pecl install mongodb \
     && docker-php-ext-enable redis xdebug amqp mongodb apcu swoole \
-    && docker-php-ext-install tidy \
-    && docker-php-ext-install recode \
-    && docker-php-ext-install pspell \
     && docker-php-ext-install opcache \
-    && docker-php-ext-install enchant \
-    && docker-php-ext-install dba \
-    && docker-php-ext-install bz2 \
-    && docker-php-ext-install wddx \
-    && docker-php-ext-install sysvmsg \
-    && docker-php-ext-install sysvshm \
-    && docker-php-ext-install pcntl \
-    && docker-php-ext-install gmp \
-    && docker-php-ext-install exif \
-    && docker-php-ext-install calendar \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install sysvsem \
-    && docker-php-ext-install mysqli \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install bcmath \
-    && docker-php-ext-install soap \
-    && docker-php-ext-install opcache \
-    && docker-php-ext-install gettext \
-    && docker-php-ext-install shmop
+    && docker-php-ext-install bcmath
 
 ############################
 #安装PHP包管理工具composer
@@ -109,17 +53,3 @@ RUN curl -fsSL https://getcomposer.org/installer | php \
 RUN curl -fsSL http://phar.phpunit.cn/phpunit.phar -o phpunit \
     && mv phpunit /usr/local/bin/phpunit \
     && chmod +x /usr/local/bin/phpunit
-
-############################
-#安装PHP特殊扩展
-############################
-
-RUN curl -fsSL https://github.com/phalcon/cphalcon/archive/v${EXT_PHALCON_VERSION}.tar.gz -o phalcon.tar.gz \
-    && mkdir -p phalcon \
-    && tar -xf phalcon.tar.gz -C phalcon --strip-components=1 \
-    && rm -rf phalcon.tar.gz \
-    && cd phalcon/build \
-    && ./install \
-    && echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/phalcon.ini \
-    && cd ../../ \
-    && rm -r phalcon
