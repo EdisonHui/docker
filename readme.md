@@ -3,7 +3,7 @@
 #### 安装Docker 
 
 - [install docker](https://docs.docker.com/install/linux/docker-ce/centos).
-- [install docker compose](https://docs.docker.com/compose/install).
+- [install docker compose](http://get.daocloud.io/#install-compose).
 
 #### 加速源配置
 
