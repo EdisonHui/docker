@@ -1,8 +1,10 @@
-FROM rabbitmq:latest
+ARG  RABBITMQ_VERSION
+FROM rabbitmq:${RABBITMQ_VERSION}
 
-RUN sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list
-RUN sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list
-RUN apt-get update && apt-get install -y unzip curl
-RUN curl -fsSL https://dl.bintray.com/rabbitmq/community-plugins/3.7.x/rabbitmq_delayed_message_exchange/rabbitmq_delayed_message_exchange-20171201-3.7.x.zip -o /home/dmp.zip
-RUN unzip /home/dmp.zip -d /plugins && rm -rf /home/dmp.zip
-RUN rabbitmq-plugins enable --offline rabbitmq_mqtt rabbitmq_federation_management rabbitmq_stomp rabbitmq_delayed_message_exchange
+RUN sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list \
+&& sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list \
+&& apt-get update  \
+&& apt-get install -y unzip curl \
+&& curl -fsSL https://dl.bintray.com/rabbitmq/community-plugins/3.7.x/rabbitmq_delayed_message_exchange/rabbitmq_delayed_message_exchange-20171201-3.7.x.zip -o /home/dmp.zip \
+&& unzip /home/dmp.zip -d /plugins && rm -rf /home/dmp.zip \
+&& rabbitmq-plugins enable --offline rabbitmq_mqtt rabbitmq_federation_management rabbitmq_stomp rabbitmq_delayed_message_exchange

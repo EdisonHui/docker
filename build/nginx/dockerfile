@@ -1,5 +1,2 @@
-FROM nginx:1.14
-
-RUN mkdir /data
-
-RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
+ARG	 NGINX_VERSION
+FROM nginx:${NGINX_VERSION}

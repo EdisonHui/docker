@@ -1,27 +1,11 @@
 version: "3"
 services:
-  php:
-    build:
-      context: build/php
-      dockerfile: dockerfile
-      args:
-        PHP_FPM_VERSION: ${PHP_FPM_VERSION}
-    container_name: ${CONTAINER_NAME_PHP}
-    hostname: ${HOSTNAME_PHP}
-    ports:
-      - 9001:9001
-    networks:
-      web:
-        ipv4_address:  ${NETWORK_IPV4_ADDRESS_PHP}
-    restart: always
-    volumes:
-      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
-      - ./conf/hosts:/etc/hosts
-      - ./conf/php/extend.ini:/usr/local/etc/php/conf.d/extend.ini
   nginx:
     build:
       context: build/nginx
       dockerfile: dockerfile
+      args:
+        NGINX_VERSION: ${NGINX_VERSION}
     container_name: ${CONTAINER_NAME_NGINX}
     hostname: ${HOSTNAME_NGINX}
     ports:
@@ -70,6 +54,8 @@ services:
     build:
       context: build/rabbitmq
       dockerfile: dockerfile
+      args:
+        RABBITMQ_VERSION: ${RABBITMQ_VERSION}
     ports:
       - 15672:15672
     networks:
@@ -98,6 +84,24 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  php:
+    build:
+      context: build/php
+      dockerfile: dockerfile
+      args:
+        PHP_FPM_VERSION: ${PHP_FPM_VERSION}
+    container_name: ${CONTAINER_NAME_PHP}
+    hostname: ${HOSTNAME_PHP}
+    ports:
+      - 9001:9001
+    networks:
+      web:
+        ipv4_address:  ${NETWORK_IPV4_ADDRESS_PHP}
+    restart: always
+    volumes:
+      - ${WEB_DATA_ROOT_DIR}:/data/htdocs
+      - ./conf/hosts:/etc/hosts
+      - ./conf/php/extend.ini:/usr/local/etc/php/conf.d/extend.ini
 networks:
   web:
     driver: ${NETWORK_WEB_DEFAULT_DRIVER}
