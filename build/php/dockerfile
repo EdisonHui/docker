@@ -20,17 +20,19 @@ RUN curl -fsSL https://getcomposer.org/installer | php \
     && apt-get update \
     && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev libpq-dev libbz2-dev libgmp-dev \
     librabbitmq-dev zip unzip libtidy-dev librecode-dev libpspell-dev libenchant-dev libxml2-dev libxslt-dev \
+    librdkafka-dev \
     ############################
     #安装PHP扩展
     ############################
     && pecl channel-update pecl.php.net \ 
+    && pecl install rdkafka \
     && pecl install swoole \
     && pecl install redis \
     && pecl install apcu \
     && pecl install xdebug \
     && pecl install amqp \
     && pecl install mongodb \
-    && docker-php-ext-enable redis xdebug amqp mongodb apcu swoole \
+    && docker-php-ext-enable rdkafka swoole redis apcu xdebug amqp mongodb \
     && docker-php-ext-install tidy \
     && docker-php-ext-install recode \
     && docker-php-ext-install pspell \
