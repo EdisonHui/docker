@@ -130,9 +130,26 @@ services:
     hostname: ${HOSTNAME_KAFKA}
     ports:
       - 9092:9092
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: ${NETWORK_IPV4_ADDRESS_ZOOKEEPER}
+      KAFKA_LISTENERS: PLAINTEXT://:9092
     networks:
       web:
         ipv4_address:  ${NETWORK_IPV4_ADDRESS_KAFKA}
+    restart: always
+  zookeeper:
+    build:
+      context: build/zookeeper
+      dockerfile: dockerfile
+      args:
+        ZOOKEEPER_VERSION: ${ZOOKEEPER_VERSION}
+    container_name: ${CONTAINER_NAME_ZOOKEEPER}
+    hostname: ${HOSTNAME_ZOOKEEPER}
+    ports:
+      - 2181:2181
+    networks:
+      web:
+        ipv4_address:  ${NETWORK_IPV4_ADDRESS_ZOOKEEPER}
     restart: always
 networks:
   web:
