@@ -20,11 +20,11 @@ RUN curl -fsSL https://getcomposer.org/installer | php \
     ############################
     #安装PHP扩展
     ############################
+    && docker-php-ext-install bcmath \
+    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
     && pecl install swoole \
     && pecl install redis \
     && pecl install amqp \
     && pecl install mongodb \
-    && docker-php-ext-enable swoole redis amqp mongodb \
-    && docker-php-ext-install bcmath \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-enable swoole redis amqp mongodb
